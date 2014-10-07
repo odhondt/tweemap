@@ -6,7 +6,6 @@ import tweepy
 import time
 import folium
 import os.path
-import sys
 
 
 def retrieve_contacts(api):
@@ -129,8 +128,7 @@ def main():
     consumer_secret = None
     access_token = None
     access_token_secret = None
-    #sys.path.append('.')
-    import cred
+    from cred import *
     print consumer_key
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -139,7 +137,7 @@ def main():
     print "Retrieving the list of your contacts with tweepy"
     fname = "twitter_contacts.json"
     bool_load = True
-    df = pd.DataFrame(columns=['name', 'location', 'relation']);
+    df = pd.DataFrame(columns=['name', 'location', 'relation'])
     if os.path.isfile(fname):
         print "A file of your contacts already exists."
         s = raw_input("Load it or use api calls? (Y|n)")
@@ -172,7 +170,6 @@ def main():
                              licenses/by-sa/2.0/">CC-BY-SA</a>""")
     populate_map(df, mapContacts, '#f6546a')
     mapContacts.create_map('map.html')
-
 
 
 if __name__ == "__main__":
