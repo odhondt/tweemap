@@ -1,11 +1,15 @@
 #!/Users/oliv/anaconda/bin/python
 
+import tweepy
 import pandas as pd
 from geopy import Nominatim
-import tweepy
-import time
 import folium
-import os.path
+
+import time
+import os
+import sys
+import webbrowser
+
 from cred import *
 
 
@@ -25,13 +29,13 @@ def populate_df(l_follow, l_friends):
                                   columns=['name', 'location'])
 
     # removing mutual follows from followers and putting them in a separate list
-    mask_follow = df_follow_all.name.isin(df_friends_all.name)
+    mask_follow = df_follow_all['name'].isin(df_friends_all.name)
     df_mutual = df_follow_all[mask_follow]
-    df_follow = df_follow_all[not mask_follow]
+    df_follow = df_follow_all[~mask_follow]
 
     # removing mutual follows from friends
-    mask_friends = df_friends_all.name.isin(df_follow_all.name)
-    df_friends = df_friends_all[not mask_friends]
+    mask_friends = df_friends_all['name'].isin(df_follow_all.name)
+    df_friends = df_friends_all[~mask_friends]
 
     # adding column with type follower, following or mutual
     df_friends['relation'] = 'following'
@@ -48,8 +52,13 @@ def geolocate_contacts(df):
     geolocator = Nominatim()
     df['lat'] = float('nan')
     df['lon'] = float('nan')
+    min_wait = 1.0
     cnt = 0
+    num_entries = len(df)
     for idx, it in enumerate(df['location']):
+        sys.stdout.write("\rProcessing user # %d of %d\r"
+                         % (idx+1, num_entries))
+        sys.stdout.flush()
         if it != '':
             # avoids interrupting the loop by time-out errors
             try:
@@ -60,11 +69,10 @@ def geolocate_contacts(df):
                                               exactly_one=True,
                                               timeout=5)
                 t1 = time.clock()
-                dt = 1 - t1 - t0
+                dt = min_wait - (t1 - t0)
                 if dt > 0:
                     time.sleep(dt)
             except:
-                print df.location[idx] + " failed"
                 location = None
 
             if location is not None:
@@ -73,7 +81,7 @@ def geolocate_contacts(df):
                 cnt = cnt + 1
         else:
             cnt = cnt + 1
-    print "%d known locations among %d" % (cnt, len(df))
+    print "%d successful geolocations among %d" % (cnt, len(df))
 
 
 def populate_map(df, map_folium, color):
@@ -124,12 +132,9 @@ def populate_map(df, map_folium, color):
 
 
 def main():
-    # Loading variables containing credentials for authentication
-    consumer_key = None
-    consumer_secret = None
-    access_token = None
-    access_token_secret = None
 
+    print "------- Tweemap.py -------"
+    print "Authentication"
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
@@ -149,8 +154,9 @@ def main():
         l_follow, l_friends = retrieve_contacts(api)
         df = populate_df(l_follow, l_friends)
         print "Contacts retrieved."
-        s = raw_input("""Write data as a file? (Y|n)\n
-                         WARNING: old file will be overwritten!""")
+        print "Write data as a file?"
+        print "WARNING: old file will be overwritten!"
+        s = raw_input("(Y|n)")
         if s.lower() != 'n':
             df.to_json(fname)
 
@@ -158,17 +164,20 @@ def main():
     geolocate_contacts(df)
 
     print "Creating the map"
-    mapContacts = folium.Map(location=[20, -10], zoom_start=2,
-                             tiles=r"""http://{s}.tile.thunderforest.com/
-                             landscape/{z}/{x}/{y}.png""",
-                             attr="""&copy; <a href="http://www.opencyclemap.org">
-                             OpenCycleMap</a>,
-                             &copy; <a href="http://openstreetmap.org">
-                             OpenStreetMap</a> contributors,
-                             <a href="http://creativecommons.org/
-                             licenses/by-sa/2.0/">CC-BY-SA</a>""")
-    populate_map(df, mapContacts, '#f6546a')
-    mapContacts.create_map('map.html')
+    map_usr = folium.Map(location=[20, -10], zoom_start=2,
+                         tiles=(r"http://{s}.tile.thunderforest.com/"
+                                "landscape/{z}/{x}/{y}.png"),
+                         attr=('&copy; <a href="http://www.opencyclemap.org">'
+                               'OpenCycleMap</a>,'
+                               '&copy; <a href="http://openstreetmap.org">'
+                               'OpenStreetMap</a> contributors,'
+                               '<a href="http://creativecommons.org/'
+                               'licenses/by-sa/2.0/">CC-BY-SA</a>'))
+    populate_map(df, map_usr, '#f6546a')
+
+    map_file = 'map.html'
+    map_usr.create_map(map_file)
+    webbrowser.open('file://'+os.getcwd()+'/'+map_file, new=1)
 
 
 if __name__ == "__main__":
