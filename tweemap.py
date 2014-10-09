@@ -102,6 +102,7 @@ def populate_map(df, map_folium, color):
         try:
             name = str(s.encode('ascii', 'xmlcharrefreplace'))
         except:
+            print s + "encoding failed"
             name = "unknown"
 
         if not(isnan(lat)) and not(isnan(lon)):
