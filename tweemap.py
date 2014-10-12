@@ -55,7 +55,7 @@ def geolocate_contacts(df):
     min_wait = 1.0
     cnt = 0
     num_entries = len(df)
-    for idx, it in enumerate(df['location'][:20]):
+    for idx, it in enumerate(df['location']):
         sys.stdout.write("\rProcessing user # %d of %d\r"
                          % (idx+1, num_entries))
         sys.stdout.flush()
@@ -79,8 +79,6 @@ def geolocate_contacts(df):
                 df.lat[idx] = location.latitude
                 df.lon[idx] = location.longitude
                 cnt = cnt + 1
-    print "%d successful geolocations among %d"\
-        % (cnt, len(df[df['location'] != '']))
 
 
 def populate_map(df, map_folium, color):
@@ -128,45 +126,41 @@ def populate_map(df, map_folium, color):
                                          fill_color=color,
                                          fill_opacity=0.7,
                                          popup=name)
-    print "%d known locations among %d" % (cnt, len(df))
+    print "%d mapped locations" % (cnt)
 
 
 def main():
 
-    print "------- Tweemap.py -------"
-    print "Authentication"
+    print "\n------- Tweemap.py -------"
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
-
-    print "Retrieving the list of your contacts with tweepy"
     fname = "twitter_contacts.json"
     bool_load = False
     df = pd.DataFrame(columns=['name', 'location', 'relation'])
     if os.path.isfile(fname):
         print "A file of your contacts already exists."
-        s = raw_input("Load it or use api calls? (Y|n)")
+        s = raw_input("Load it? (Y|n) ")
         if s.lower() != 'n':
             bool_load = True
             df = pd.read_json(fname)
-
     if not bool_load:
+        print "Retrieving the list of your contacts with tweepy"
         l_follow, l_friends = retrieve_contacts(api)
         df = populate_df(l_follow, l_friends)
         print "Contacts retrieved."
         print "Write data as a file?"
         print "WARNING: old file will be overwritten!"
-        s = raw_input("(Y|n)")
+        s = raw_input("(Y|n) ")
         if s.lower() != 'n':
             df.to_json(fname)
-
     num_loc = len(df[df['location'] != ''])
     print "%d / %d of your contacts gave their location" % (num_loc, len(df))
-    print "Geolocating your contacts with geopy"
+    print "Geolocating your contacts with geopy:"
     geolocate_contacts(df)
     num_geoloc = len(df[df['lat'].notnull()])
     print "%d / %d of your contacts were geolocated" % (num_geoloc, len(df))
-    print "Creating the map"
+    print "Creating the map:"
     map_usr = folium.Map(location=[20, -10], zoom_start=2,
                          tiles=(r"http://{s}.tile.thunderforest.com/"
                                 "landscape/{z}/{x}/{y}.png"),
