@@ -55,7 +55,7 @@ def geolocate_contacts(df):
     min_wait = 1.0
     cnt = 0
     num_entries = len(df)
-    for idx, it in enumerate(df['location']):
+    for idx, it in enumerate(df['location'][:20]):
         sys.stdout.write("\rProcessing user # %d of %d\r"
                          % (idx+1, num_entries))
         sys.stdout.flush()
@@ -79,9 +79,8 @@ def geolocate_contacts(df):
                 df.lat[idx] = location.latitude
                 df.lon[idx] = location.longitude
                 cnt = cnt + 1
-        else:
-            cnt = cnt + 1
-    print "%d successful geolocations among %d" % (cnt, len(df))
+    print "%d successful geolocations among %d"\
+        % (cnt, len(df[df['location'] != '']))
 
 
 def populate_map(df, map_folium, color):
@@ -161,9 +160,12 @@ def main():
         if s.lower() != 'n':
             df.to_json(fname)
 
+    num_loc = len(df[df['location'] != ''])
+    print "%d / %d of your contacts gave their location" % (num_loc, len(df))
     print "Geolocating your contacts with geopy"
     geolocate_contacts(df)
-
+    num_geoloc = len(df[df['lat'].notnull()])
+    print "%d / %d of your contacts were geolocated" % (num_geoloc, len(df))
     print "Creating the map"
     map_usr = folium.Map(location=[20, -10], zoom_start=2,
                          tiles=(r"http://{s}.tile.thunderforest.com/"
