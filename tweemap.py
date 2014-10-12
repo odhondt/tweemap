@@ -1,5 +1,3 @@
-#!/Users/oliv/anaconda/bin/python
-
 import tweepy
 import pandas as pd
 from geopy import Nominatim
@@ -14,7 +12,6 @@ from cred import *
 
 
 def retrieve_contacts(api):
-    # using list comprehension to extract followers informations
     l_follow = [it for it in tweepy.Cursor(api.followers, count=200).items()]
     l_friends = [it for it in tweepy.Cursor(api.friends, count=200).items()]
     return (l_follow, l_friends)
@@ -37,7 +34,6 @@ def populate_df(l_follow, l_friends):
     mask_friends = df_friends_all['name'].isin(df_follow_all.name)
     df_friends = df_friends_all[~mask_friends]
 
-    # adding column with type follower, following or mutual
     df_friends['relation'] = 'following'
     df_follow['relation'] = 'follower'
     df_mutual['relation'] = 'mutual'
