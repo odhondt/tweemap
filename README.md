@@ -8,8 +8,6 @@ This python script creates an interactive map of your twitter contacts and class
 
 **Limitation:** due to the rate restriction imposed by twitter's api, only up to 3000 contacts can be displayed in this version.
 
-**WARNING** use at your own risk. This version is not the final one, there are still some small bugs to fix.
-
 * dependecies:
   * tweepy
   * pandas
