@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Tweemap : Create an interactive map of your twitter contacts">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Tweemap</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/odhondt/tweemap">View on GitHub</a>
+
+          <h1 id="project_title">Tweemap</h1>
+          <h2 id="project_tagline">Create an interactive map of your twitter contacts</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/odhondt/tweemap/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/odhondt/tweemap/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="tweemappy" class="anchor" href="#tweemappy"><span class="octicon octicon-link"></span></a>tweemap.py</h1>
+
+<p>Map your twitter contacts!</p>
+
+<p><img src="https://raw.githubusercontent.com/odhondt/tweemap/master/screenshot.png" alt="screenshot"></p>
+
+<p>This python script creates an interactive map of your twitter contacts and classifies them into 3 categories: following, follower and mutual. You can drag and zoom the map. Clicking on a marker opens a pop-up with user names, locations and relationships. If several users are located in the same spot, the marker is a circle with a radius proportional to the number of contacts. The colors correspond to the relationship.</p>
+
+<p><strong>Limitation:</strong> due to the rate restriction imposed by twitter's api, only up to 3000 contacts can be displayed in this version.</p>
+
+<ul>
+<li>
+<p>dependencies:</p>
+
+<ul>
+<li>tweepy</li>
+<li>pandas</li>
+<li>geopy</li>
+<li>folium</li>
+</ul>
+</li>
+<li>
+<p>usage:</p>
+
+<ul>
+<li>change <code>cred_example.py</code> name into <code>cred.py</code>
+</li>
+<li>register for a twitter application and fill in the variables with your credentials in <code>cred.py</code>
+</li>
+<li>launch <code>python tweemap.py</code>. This might take a while depending on how many contacts you have.</li>
+<li>In the end, a browser window with the map should open.</li>
+</ul>
+</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Tweemap maintained by <a href="https://github.com/odhondt">odhondt</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
