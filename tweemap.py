@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import tweepy
 import pandas as pd
 from geopy import Nominatim
@@ -55,7 +57,7 @@ def geolocate_contacts(df):
         sys.stdout.write("\rProcessing user # %d of %d\r"
                          % (idx+1, num_entries))
         sys.stdout.flush()
-        if it != '':
+        if it:
             # avoids interrupting the loop by time-out errors
             try:
                 # we also limit the rate of request to one per second
@@ -98,8 +100,8 @@ def populate_map(df, map_folium, color):
             print s + "encoding failed"
             name = "unknown"
 
-        if not(isnan(lat)) and not(isnan(lon)):
-            cnt = cnt + len(grp)
+        if not isnan(lat) and not isnan(lon):
+            cnt += len(grp)
             if len(grp) == 1:
                 color = color_choice[grp.relation.iloc[0]]
                 map_folium.polygon_marker(location=[lat, lon],
@@ -122,11 +124,10 @@ def populate_map(df, map_folium, color):
                                          fill_color=color,
                                          fill_opacity=0.7,
                                          popup=name)
-    print "%d mapped locations" % (cnt)
+    return cnt
 
 
 def main():
-
     print "\n------- Tweemap.py -------"
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -160,13 +161,14 @@ def main():
     map_usr = folium.Map(location=[20, -10], zoom_start=2,
                          tiles=(r"http://{s}.tile.thunderforest.com/"
                                 "landscape/{z}/{x}/{y}.png"),
-                         attr=('&copy; <a href="http://www.opencyclemap.org">'
-                               'OpenCycleMap</a>,'
-                               '&copy; <a href="http://openstreetmap.org">'
-                               'OpenStreetMap</a> contributors,'
-                               '<a href="http://creativecommons.org/'
-                               'licenses/by-sa/2.0/">CC-BY-SA</a>'))
-    populate_map(df, map_usr, '#f6546a')
+                         attr=("&copy; <a href=\"http://www.opencyclemap.org\">"
+                               "OpenCycleMap</a>,"
+                               "&copy; <a href=\"http://openstreetmap.org\">"
+                               "OpenStreetMap</a> contributors,"
+                               "<a href=\"http://creativecommons.org/"
+                               "licenses/by-sa/2.0/\">CC-BY-SA</a>"))
+    num_mapped = populate_map(df, map_usr, '#f6546a')
+    print "%d mapped locations" % (num_mapped)
 
     map_file = 'map.html'
     map_usr.create_map(map_file)
