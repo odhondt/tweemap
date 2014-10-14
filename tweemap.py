@@ -53,7 +53,7 @@ def geolocate_contacts(df):
     min_wait = 1.0
     cnt = 0
     num_entries = len(df)
-    for idx, it in enumerate(df['location']):
+    for idx, it in enumerate(df['location'][:10]):
         sys.stdout.write("\rProcessing user # %d of %d\r"
                          % (idx+1, num_entries))
         sys.stdout.flush()
@@ -159,14 +159,14 @@ def main():
     print "%d / %d of your contacts were geolocated" % (num_geoloc, len(df))
     print "Creating the map:"
     map_usr = folium.Map(location=[20, -10], zoom_start=2,
-                         tiles=(r"http://{s}.tile.thunderforest.com/"
-                                "landscape/{z}/{x}/{y}.png"),
-                         attr=("&copy; <a href=\"http://www.opencyclemap.org\">"
+                         tiles=r"http://{s}.tile.thunderforest.com/"
+                               "landscape/{z}/{x}/{y}.png",
+                         attr="&copy; <a href=\"http://www.opencyclemap.org\">"
                                "OpenCycleMap</a>,"
                                "&copy; <a href=\"http://openstreetmap.org\">"
                                "OpenStreetMap</a> contributors,"
                                "<a href=\"http://creativecommons.org/"
-                               "licenses/by-sa/2.0/\">CC-BY-SA</a>"))
+                               "licenses/by-sa/2.0/\">CC-BY-SA</a>")
     num_mapped = populate_map(df, map_usr, '#f6546a')
     print "%d mapped locations" % (num_mapped)
 
